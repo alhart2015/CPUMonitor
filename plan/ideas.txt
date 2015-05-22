@@ -3,4 +3,6 @@ May 21, 2015
 Ideas and stuff
 
 CPU MONITOR
-GONNA BE AWESOME
+
+GOAL:
+  % load on each core
