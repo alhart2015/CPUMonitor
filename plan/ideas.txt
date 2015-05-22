@@ -6,3 +6,7 @@ CPU MONITOR
 
 GOAL:
   % load on each core
+
+Maybe later:
+    - Which processes are running, how much they're taking
+    - A nice looking GUI
