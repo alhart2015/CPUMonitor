@@ -1,4 +1,4 @@
-all: run-back
+all: gui
 
 #
 # VARS
@@ -31,6 +31,13 @@ $(BUILD_DIR)/%.o: %.c | $(BUILD_DIR)
 #
 # TEST
 #
+
+#
+# FRONT
+#
+
+gui:
+	@python cpu_monitor_gui.py
 
 #
 # BACK
