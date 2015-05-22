@@ -10,3 +10,14 @@ GOAL:
 Maybe later:
     - Which processes are running, how much they're taking
     - A nice looking GUI
+
+DESIGN:
+  - Frontend GUI starts backend process as child process, passing command line arguments.
+    - These arguments are things like the data rate.
+    - This is good because it leaves room for other backend arguments to be created.
+    - This is bad because the child backend process will have to be restarted to change options.
+    - This would save us the complexity of another inter-process communication mechanism between the backend and GUI.
+  - Backend writes different kinds of CPU information to a loopback socket.
+    - Maybe this could be formatted in JSON or something so a python package could easily read it.
+  - Frontend GUI read data off of the socket and displays it.
+
