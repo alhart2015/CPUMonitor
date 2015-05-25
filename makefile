@@ -12,6 +12,7 @@ LDFLAGS=
 BUILD_DIR=build
 
 BACK_DIR=back
+GUI_DIR = gui
 
 VPATH=$(BACK_DIR)
 
@@ -37,7 +38,7 @@ $(BUILD_DIR)/%.o: %.c | $(BUILD_DIR)
 #
 
 gui:
-	@python cpu_monitor_gui.py
+	@$(GUI_DIR)/python cpu_monitor_gui.py
 
 #
 # BACK

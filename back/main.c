@@ -10,6 +10,8 @@
 //
 
 #include <stdio.h>
+#include <stdlib.h>
+// #include <sys/sysinfo.h>    // Looks like this is a good library we should use
 
 int main(int argc, char *argv[])
 {
