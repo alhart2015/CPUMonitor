@@ -43,7 +43,6 @@ FORCE:
 # FRONT
 #
 
-=======
 gui: FORCE # TODO: do we really need this FORCE here?
 	@python gui/cpu_monitor_gui.py
 
