@@ -30,6 +30,12 @@ $(BUILD_DIR)/%.o: %.c | $(BUILD_DIR)
 	$(CC) $(CFLAGS) -o $@ -c $<
 
 #
+# UTIL
+#
+
+FORCE:
+
+#
 # TEST
 #
 
@@ -37,8 +43,9 @@ $(BUILD_DIR)/%.o: %.c | $(BUILD_DIR)
 # FRONT
 #
 
-gui:
-	@$(GUI_DIR)/python cpu_monitor_gui.py
+=======
+gui: FORCE # TODO: do we really need this FORCE here?
+	@python gui/cpu_monitor_gui.py
 
 #
 # BACK
