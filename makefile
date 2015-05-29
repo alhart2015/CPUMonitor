@@ -40,7 +40,7 @@ FORCE:
 # TEST
 #
 
-test: back-test
+test: back-test ipc_test
 
 #
 # FRONT
@@ -48,6 +48,9 @@ test: back-test
 
 gui: FORCE # TODO: do we really need this FORCE here?
 	@python gui/cpu_monitor_gui.py
+
+ipc_test:
+	@python gui/ipc_test.py
 
 #
 # BACK
