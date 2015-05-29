@@ -3,3 +3,6 @@
 
 # Wes Mantooth
 build/
+
+# Alden - what should I be doing with these files?
+*.pyc
