@@ -38,6 +38,8 @@ def run(name, func):
 
 PORT = 55555
 
+MTU = 1500
+
 SMALL_DATA = 'tuna'
 LARGE_DATA = '''
 RAGHURAM RAMANUJAN
@@ -76,7 +78,7 @@ def ipc_test():
   send_from_fake_child(SMALL_DATA)
   progress()
 
-  rx = connection.receive()
+  rx = connection.receive(MTU)
   progress()
 
   expect(rx, SMALL_DATA)
@@ -84,7 +86,7 @@ def ipc_test():
   send_from_fake_child(LARGE_DATA)
   progress()
 
-  rx = connection.receive()
+  rx = connection.receive(MTU)
   progress()
   
   expect(rx, LARGE_DATA)
