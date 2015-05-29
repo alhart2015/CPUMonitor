@@ -14,12 +14,11 @@
 #include <stdbool.h> // bool, true, false
 
 #include <sys/socket.h> // socket
-#include <netinet/in.h> // INADDR_LOOPBACK, sockaddr_in
-#include <arpa/inet.h>  // htons, htonl
+#include <sys/un.h>     // sockaddr_un
 
 #include <limits.h> // INT_MAX
 #include <unistd.h> // close
-#include <string.h> // memset
+#include <string.h> // memset, strcpy
 
 #ifdef BACK_TEST
   #include <stdio.h>
@@ -28,23 +27,22 @@
   #define debugPrintln(...)
 #endif
 
-int socketFd = INT_MAX;
+static int socketFd = INT_MAX;
 
-int ipcInit(uint16_t port)
+int ipcInit(const char *path)
 {
   bool err;
-  struct sockaddr_in loopbackAddress;
+  struct sockaddr_un address;
 
-  err = ((socketFd = socket(AF_INET, SOCK_DGRAM, 0)) == -1);
+  err = ((socketFd = socket(AF_UNIX, SOCK_DGRAM, 0)) == -1);
 
   if (!err) {
-    memset(&loopbackAddress, sizeof(loopbackAddress), 0);
-    loopbackAddress.sin_family = AF_INET;
-    loopbackAddress.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-    loopbackAddress.sin_port = htons(port);
+    memset(&address, sizeof(address), 0);
+    address.sun_family = AF_UNIX;
+    strcpy(address.sun_path, path);
     err = (connect(socketFd,
-                   (struct sockaddr *)&loopbackAddress,
-                   sizeof(loopbackAddress)) == -1);
+                   (struct sockaddr *)&address,
+                   sizeof(address)) == -1);
   }
 
   return (err ? errno : 0);

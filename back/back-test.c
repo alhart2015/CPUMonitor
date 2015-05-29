@@ -13,11 +13,10 @@
 #include <stdint.h>
 #include <assert.h>
 #include <string.h> // memcmp
-#include <unistd.h> // close
+#include <unistd.h> // close, unlink
 
-#include <sys/socket.h> // socket, recvfrom
-#include <netinet/in.h> // INADDR_LOOPBACK, sockaddr_in
-#include <sys/time.h> // timeval
+#include <sys/socket.h> // socket, recv
+#include <sys/un.h>     // sockaddr_un
 
 #include "back/ipc.h"
 
@@ -30,7 +29,7 @@
 #define note(x)    \
   do { printf("(%s = %d)", #x, x); } while (0)
                                          
-#define PORT 55555
+#define PATH "./.back-test-sock"
 
 #define SMALL_BYTES_COUNT (5)
 static uint8_t smallBytes[SMALL_BYTES_COUNT] = { 1, 2, 3, 4, 5, };
@@ -54,20 +53,22 @@ static int fakeParentSock;
 
 static void startFakeParent(void)
 {
-  struct sockaddr_in loopbackAddress;
+  struct sockaddr_un address;
 
-  if ((fakeParentSock = socket(AF_INET, SOCK_DGRAM, 0)) == -1) {
+  if (unlink(PATH) == -1) {
     note(errno);
     assert(0);
   }
 
-  loopbackAddress.sin_family = AF_INET;
-  loopbackAddress.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-  loopbackAddress.sin_port = htons(PORT);
-  if (bind(fakeParentSock,
-           (struct sockaddr *)&loopbackAddress,
-           sizeof(loopbackAddress))
-      == -1) {
+  if ((fakeParentSock = socket(AF_UNIX, SOCK_DGRAM, 0)) == -1) {
+    note(errno);
+    assert(0);
+  }
+
+  memset(&address, sizeof(address), 0);
+  address.sun_family = AF_UNIX;
+  strcpy(address.sun_path, PATH);
+  if (bind(fakeParentSock, (struct sockaddr *)&address, sizeof(address)) == -1) {
     note(errno);
     assert(0);
   }
@@ -90,7 +91,7 @@ static void socketTest(void)
   int err;
 
   // Make sure the socket initializes correctly.
-  err = ipcInit(PORT);
+  err = ipcInit(PATH);
   expect(!err);
 
   // Send some bytes.

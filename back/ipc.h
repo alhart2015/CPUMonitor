@@ -15,8 +15,8 @@
 // Initialize the inter-process communication channel with the parent.
 // If the channel could not be initialized, it will return the errno
 // value that was defined for the failed socket system call.
-// The argument is the port for the connection.
-int ipcInit(uint16_t port);
+// The argument is the address of the unix domain socket.
+int ipcInit(const char *address);
 
 // This will close the socket to the parent.
 void ipcDeinit(void);
