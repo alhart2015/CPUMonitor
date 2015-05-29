@@ -40,7 +40,7 @@ FORCE:
 # TEST
 #
 
-test: back-test ipc_test
+test: run-back-test ipc_test
 
 #
 # FRONT
