@@ -13,9 +13,8 @@ BUILD_DIR=build
 
 BACK_DIR=back
 GUI_DIR = gui
-TEST_DIR = test
 
-VPATH=$(BACK_DIR) $(TEST_DIR)
+VPATH=$(BACK_DIR)
 
 #
 # BUILD
@@ -66,7 +65,7 @@ BACK_OBJ=$(addprefix $(BUILD_DIR)/, $(notdir $(BACK_SOURCE:.c=.o)))
 $(BUILD_DIR)/back: $(BACK_OBJ) | $(BUILD_DIR)
 	$(CC) $(LDFLAGS) -o $@ $^
 
-BACK_TEST_FILES=$(TEST_DIR)/back-test.c $(BACK_DIR)/ipc.c
+BACK_TEST_FILES=$(BACK_DIR)/back-test.c $(BACK_DIR)/ipc.c
 
 $(BUILD_DIR)/back-test: CFLAGS += -DBACK_TEST
 $(BUILD_DIR)/back-test: $(addprefix $(BUILD_DIR)/,$(notdir $(BACK_TEST_FILES:.c=.o)))
