@@ -28,9 +28,11 @@ void ipcDeinit(void);
 // If it has not been called, this function will return EINVAL.
 int ipcTransmit(uint8_t *bytes, uint32_t count);
 
-// Receive some bytes.
-// Rumor has it that the looback socket is full-duplex...does that
-// mean that we can receive from the same guy too?
+// Receive some bytes from the parent.
+// If the receive failed, it will return the errno value associated
+// with the failure.
+// Note that ipcInit() must be called before receiving bytes.
+// If it has not been called, this function will return EINVAL.
 // FIXME:
 int ipcReceive(uint8_t *bytes, uint32_t count);
 

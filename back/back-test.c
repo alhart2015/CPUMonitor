@@ -50,11 +50,10 @@ static uint8_t largeBytes[LARGE_BYTES_COUNT] = {
 // Fake parent stuff
 
 static int fakeParentSock;
+struct sockaddr_un address;
 
 static void startFakeParent(void)
 {
-  struct sockaddr_un address;
-
   if (unlink(PATH) == -1) {
     note(errno);
     assert(0);
@@ -69,6 +68,20 @@ static void startFakeParent(void)
   address.sun_family = AF_UNIX;
   strcpy(address.sun_path, PATH);
   if (bind(fakeParentSock, (struct sockaddr *)&address, sizeof(address)) == -1) {
+    note(errno);
+    assert(0);
+  }
+}
+
+static void sendBytes(uint8_t *bytes, uint8_t count)
+{
+  if (sendto(fakeParentSock,
+             bytes,
+             count,
+             0, // flags
+             (struct sockaddr *)&address,
+             sizeof(address))
+      == -1) {
     note(errno);
     assert(0);
   }
@@ -94,21 +107,44 @@ static void socketTest(void)
   err = ipcInit(PATH);
   expect(!err);
 
-  // Send some bytes.
+  //
+  // Child to parent.
+  //
+
+  // Send some bytes (from the child).
   err = ipcTransmit(smallBytes, SMALL_BYTES_COUNT);
   expect(!err);
 
-  // Receive those bytes.
+  // Receive those bytes (on the parent).
   receiveBytes(rxBuffer, SMALL_BYTES_COUNT);
   expect(memcmp(rxBuffer, smallBytes, SMALL_BYTES_COUNT) == 0);
 
-  // Send some bytes.
+  // Send some bytes (from the child).
   err = ipcTransmit(largeBytes, LARGE_BYTES_COUNT);
   expect(!err);
 
-  // Receive those bytes.
+  // Receive those bytes (on the parent).
   receiveBytes(rxBuffer, LARGE_BYTES_COUNT);
   expect(memcmp(rxBuffer, largeBytes, LARGE_BYTES_COUNT) == 0);
+
+  //
+  // Parent to child.
+  //
+
+  // Send some bytes (from the parent).
+  sendBytes(smallBytes, SMALL_BYTES_COUNT);
+
+  // Receive those bytes (on the child).
+  // FIXME: why does this block?
+  //expect(ipcReceive(rxBuffer, SMALL_BYTES_COUNT) == 0);
+  //expect(memcmp(rxBuffer, smallBytes, SMALL_BYTES_COUNT) == 0);
+
+  // Send some bytes (from the parent).
+  sendBytes(largeBytes, LARGE_BYTES_COUNT);
+
+  // Receive those bytes (on the child).
+  //expect(ipcReceive(rxBuffer, LARGE_BYTES_COUNT) == 0);
+  //expect(memcmp(rxBuffer, largeBytes, LARGE_BYTES_COUNT) == 0);
 
   // Close the socket.
   ipcDeinit();
