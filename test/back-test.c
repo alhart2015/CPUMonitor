@@ -21,11 +21,13 @@
 
 #include "back/ipc.h"
 
-#define expect(x) \
+#define announce() \
+  do { printf("\n/*\n/* %s\n/*\n", __FILE__); } while (0);
+#define expect(x)  \
   do { assert(x); printf("."); fflush(stdout); } while(0);
-#define run(x)    \
+#define run(x)     \
   do { printf("(test = %s) [ ", #x); x(); printf(" ]\n"); } while (0);
-#define note(x)   \
+#define note(x)    \
   do { printf("(%s = %d)", #x, x); } while (0)
                                          
 #define PORT 55555
@@ -93,6 +95,8 @@ static void socketTest(void)
 
 int main(void)
 {
+  announce();
+
   startFakeParent();
 
   run(socketTest);

@@ -90,5 +90,10 @@ def ipc_test():
   expect(rx, LARGE_DATA)
 
 if __name__ == '__main__':
+  print ''
+  print '/*'
+  print '/* ipc_test.py'
+  print '/*'
+
   run('ipc_test', ipc_test)
 
