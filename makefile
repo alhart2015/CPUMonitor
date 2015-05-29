@@ -22,7 +22,7 @@ VPATH=$(BACK_DIR) $(TEST_DIR)
 #
 
 clean:
-	rm -rdf $(BUILD_DIR)
+	rm -rdf $(BUILD_DIR) $(shell find . -name "*.pyc")
 
 $(BUILD_DIR):
 	mkdir $@
