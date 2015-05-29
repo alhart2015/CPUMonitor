@@ -91,6 +91,10 @@ def ipc_test():
   
   expect(rx, LARGE_DATA)
 
+def child_test():
+  child = ipc.Child("TODO: make a safe process to run here")
+  progress()
+
 if __name__ == '__main__':
   print ''
   print '/*'
@@ -98,4 +102,5 @@ if __name__ == '__main__':
   print '/*'
 
   run('ipc_test', ipc_test)
+  run('child_test', child_test)
 

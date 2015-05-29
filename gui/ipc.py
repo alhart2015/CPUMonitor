@@ -27,3 +27,8 @@ class ChildConnection:
     return self.sock.recv(count)
 
   
+class Child:
+
+  def __init__(self, image):
+    """Initialize a child process to communicate with."""
+    self.image = image
