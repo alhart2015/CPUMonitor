@@ -24,9 +24,9 @@
 #define announce() \
   do { printf("\n/*\n/* %s\n/*\n", __FILE__); } while (0);
 #define expect(x)  \
-  do { assert(x); printf("."); fflush(stdout); } while(0);
+  do { assert(x); printf(". "); fflush(stdout); } while(0);
 #define run(x)     \
-  do { printf("(test = %s) [ ", #x); x(); printf(" ]\n"); } while (0);
+  do { printf("(test = %s) [ ", #x); x(); printf("]\n"); } while (0);
 #define note(x)    \
   do { printf("(%s = %d)", #x, x); } while (0)
                                          
@@ -34,6 +34,18 @@
 
 #define SMALL_BYTES_COUNT (5)
 static uint8_t smallBytes[SMALL_BYTES_COUNT] = { 1, 2, 3, 4, 5, };
+
+#define LARGE_BYTES_COUNT (64)
+static uint8_t largeBytes[LARGE_BYTES_COUNT] = {
+  1, 2, 3, 4, 5, 6, 7, 8,
+  1, 2, 3, 4, 5, 6, 7, 8,
+  1, 2, 3, 4, 5, 6, 7, 8,
+  1, 2, 3, 4, 5, 6, 7, 8,
+  1, 2, 3, 4, 5, 6, 7, 8,
+  1, 2, 3, 4, 5, 6, 7, 8,
+  1, 2, 3, 4, 5, 6, 7, 8,
+  1, 2, 3, 4, 5, 6, 7, 8,
+};
 
 // -----------------------------------------------------------------------------
 // Fake parent stuff
@@ -88,6 +100,14 @@ static void socketTest(void)
   // Receive those bytes.
   receiveBytes(rxBuffer, SMALL_BYTES_COUNT);
   expect(memcmp(rxBuffer, smallBytes, SMALL_BYTES_COUNT) == 0);
+
+  // Send some bytes.
+  err = ipcTransmit(largeBytes, LARGE_BYTES_COUNT);
+  expect(!err);
+
+  // Receive those bytes.
+  receiveBytes(rxBuffer, LARGE_BYTES_COUNT);
+  expect(memcmp(rxBuffer, largeBytes, LARGE_BYTES_COUNT) == 0);
 
   // Close the socket.
   ipcDeinit();
