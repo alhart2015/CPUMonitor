@@ -15,6 +15,7 @@
 
 #include <sys/socket.h> // socket
 #include <sys/un.h>     // sockaddr_un
+#include <sys/time.h>   // timeval
 
 #include <limits.h> // INT_MAX
 #include <unistd.h> // close
@@ -33,8 +34,26 @@ int ipcInit(const char *path)
 {
   bool err;
   struct sockaddr_un address;
+  struct timeval timeout;
 
   err = ((socketFd = socket(AF_UNIX, SOCK_DGRAM, 0)) == -1);
+
+  if (!err) {
+    timeout.tv_sec  = 1; // 1 second
+    timeout.tv_usec = 0; // 0 microseconds
+    err = ((setsockopt(socketFd,
+                       SOL_SOCKET,
+                       SO_SNDTIMEO,
+                       &timeout,
+                       sizeof(timeout))
+            == -1)
+           || (setsockopt(socketFd,
+                          SOL_SOCKET,
+                          SO_RCVTIMEO,
+                          &timeout,
+                          sizeof(timeout))
+               == -1));
+  }
 
   if (!err) {
     memset(&address, sizeof(address), 0);

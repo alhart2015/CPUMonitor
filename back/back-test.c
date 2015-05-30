@@ -13,10 +13,11 @@
 #include <stdint.h>
 #include <assert.h>
 #include <string.h> // memcmp
-#include <unistd.h> // close, unlink
+#include <unistd.h> // close, unlink, access
 
 #include <sys/socket.h> // socket, recv
 #include <sys/un.h>     // sockaddr_un
+#include <sys/time.h>   // timeval
 
 #include "back/ipc.h"
 
@@ -54,7 +55,9 @@ struct sockaddr_un address;
 
 static void startFakeParent(void)
 {
-  if (unlink(PATH) == -1) {
+  struct timeval timeout;
+
+  if (access(PATH, F_OK) != -1 && unlink(PATH) == -1) {
     note(errno);
     assert(0);
   }
@@ -63,6 +66,25 @@ static void startFakeParent(void)
     note(errno);
     assert(0);
   }
+
+  timeout.tv_sec  = 1; // 1 second
+  timeout.tv_usec = 0; // 0 microseconds
+  if ((setsockopt(fakeParentSock,
+                 SOL_SOCKET,
+                 SO_SNDTIMEO,
+                 &timeout,
+                 sizeof(timeout))
+       == -1)
+      || (setsockopt(fakeParentSock,
+                     SOL_SOCKET,
+                     SO_RCVTIMEO,
+                     &timeout,
+                     sizeof(timeout))
+          == -1)) {
+    note(errno);
+    assert(0);
+  }
+
 
   memset(&address, sizeof(address), 0);
   address.sun_family = AF_UNIX;
@@ -111,6 +133,8 @@ static void socketTest(void)
   // Child to parent.
   //
 
+  memset(rxBuffer, 0, sizeof(rxBuffer) / sizeof(rxBuffer[0]));
+
   // Send some bytes (from the child).
   err = ipcTransmit(smallBytes, SMALL_BYTES_COUNT);
   expect(!err);
@@ -131,19 +155,23 @@ static void socketTest(void)
   // Parent to child.
   //
 
+  memset(rxBuffer, 0, sizeof(rxBuffer) / sizeof(rxBuffer[0]));
+
   // Send some bytes (from the parent).
   sendBytes(smallBytes, SMALL_BYTES_COUNT);
 
   // Receive those bytes (on the child).
-  // FIXME: why does this block?
-  //expect(ipcReceive(rxBuffer, SMALL_BYTES_COUNT) == 0);
+  // FIXME: why can't we receive?
+  err = ipcReceive(rxBuffer, SMALL_BYTES_COUNT);
+  //expect(err == 0);
   //expect(memcmp(rxBuffer, smallBytes, SMALL_BYTES_COUNT) == 0);
 
   // Send some bytes (from the parent).
   sendBytes(largeBytes, LARGE_BYTES_COUNT);
 
   // Receive those bytes (on the child).
-  //expect(ipcReceive(rxBuffer, LARGE_BYTES_COUNT) == 0);
+  err = ipcReceive(rxBuffer, LARGE_BYTES_COUNT);
+  //expect(err == 0);
   //expect(memcmp(rxBuffer, largeBytes, LARGE_BYTES_COUNT) == 0);
 
   // Close the socket.
