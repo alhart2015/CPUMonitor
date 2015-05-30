@@ -10,12 +10,14 @@ Authors:
 
 import ipc
 import socket
+import sys
 
 ################################################################################
 # Unit test stuffs
 
 def progress():
   print '.',
+  sys.stdout.flush()
 
 def expect(a, b):
   if a == b:
@@ -36,7 +38,7 @@ def run(name, func):
 ################################################################################
 # Tests
 
-PORT = 55555
+ADDRESS = './.monitor-sock'
 
 MTU = 1500
 
@@ -62,18 +64,27 @@ and engage in a variety of outdoor pursuits including cycling, hiking
 and nature photography.
 '''
 
-fake_child_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+fake_child_sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 def setup_fake_child():
-  fake_child_sock.connect((ipc.LOOPBACK, PORT))
+  fake_child_sock.connect(ADDRESS)
 def send_from_fake_child(data):
   fake_child_sock.send(data)
+def receive_from_fake_child(count):
+  return fake_child_sock.recv(count)
 
 def ipc_test():
-  connection = ipc.ChildConnection(PORT)
+  connection = ipc.ChildConnection(ADDRESS)
   progress()
 
   setup_fake_child()
   progress()
+
+  connection.accept()
+  progress()
+
+  #
+  # Child to parent
+  #
 
   send_from_fake_child(SMALL_DATA)
   progress()
@@ -89,6 +100,26 @@ def ipc_test():
   rx = connection.receive(MTU)
   progress()
   
+  expect(rx, LARGE_DATA)
+
+  #
+  # Parent to child
+  #
+
+  connection.send(SMALL_DATA)
+  progress()
+
+  rx = receive_from_fake_child(MTU)
+  progress()
+
+  expect(rx, SMALL_DATA)
+
+  connection.send(LARGE_DATA)
+  progress()
+
+  rx = receive_from_fake_child(MTU)
+  progress()
+
   expect(rx, LARGE_DATA)
 
 def child_test():
