@@ -36,7 +36,7 @@ int ipcInit(const char *path)
   struct sockaddr_un address;
   struct timeval timeout;
 
-  err = ((socketFd = socket(AF_UNIX, SOCK_DGRAM, 0)) == -1);
+  err = ((socketFd = socket(AF_UNIX, SOCK_STREAM, 0)) == -1);
 
   if (!err) {
     timeout.tv_sec  = 1; // 1 second
