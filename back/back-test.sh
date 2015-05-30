@@ -68,7 +68,7 @@ else
 fi
 
 # Try to run the sanity test.
-$EXEC -p $SOCKET_PATH -t sanityTest | grep -q "sanityTest"
+$EXEC -p $SOCKET_PATH -t sanityTest | grep -q "sanityTest: $SOCKET_PATH"
 if [ $? != "0" ]; then
   echo "FAIL: unable to run the sanityTest."
   exit 1

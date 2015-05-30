@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
 
 #define TEST(name) void name(const char *socketPath)
 
-#define TRY_TEST(name, potentialMatch)          \
+#define TRY_TEST(name, potentialMatch, test)    \
   if (strcmp(#name, potentialMatch) == 0) {     \
     extern void name(const char *socketPath);   \
     test = name;                                \
@@ -78,12 +78,12 @@ static TestFunction findTest(const char *name)
 {
   TestFunction test = NULL;
 
-  TRY_TEST(sanityTest, name);
+  TRY_TEST(sanityTest, name, test);
 
   return test;
 }
 
 TEST(sanityTest)
 {
-  printf("sanityTest\n"); // yeah
+  printf("sanityTest: %s\n", socketPath); // yeah
 }
