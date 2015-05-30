@@ -31,7 +31,7 @@ def run(name, func):
   try:
     func()
   except Exception as e:
-    print e
+    raise
     exit(1)
   print ']'
 
@@ -122,9 +122,23 @@ def ipc_test():
 
   expect(rx, LARGE_DATA)
 
-def child_test():
-  child = ipc.Child("TODO: make a safe process to run here")
+def sanity_test():
+  connection = ipc.ChildConnection(ADDRESS)
   progress()
+  child = ipc.Child("build/back", connection)
+  progress()
+
+  child.test("sanityTest")
+  progress()
+
+  child_stdout = child.dump()
+  first_line = child_stdout.split("\n")[0]
+  progress()
+
+  child.stop()
+  progress()
+
+  expect("sanityTest: ./.monitor-sock", first_line)
 
 if __name__ == '__main__':
   print ''
@@ -133,5 +147,5 @@ if __name__ == '__main__':
   print '/*'
 
   run('ipc_test', ipc_test)
-  run('child_test', child_test)
+  run('sanity_test', sanity_test)
 

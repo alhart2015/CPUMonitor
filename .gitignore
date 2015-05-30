@@ -6,3 +6,6 @@ build/
 
 # Alden - what should I be doing with these files?
 *.pyc
+
+# Child log files
+.child-file

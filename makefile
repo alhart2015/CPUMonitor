@@ -48,7 +48,7 @@ test: run-back-test ipc_test run-back-sanity-check
 gui: FORCE # TODO: do we really need this FORCE here?
 	@python gui/cpu_monitor_gui.py
 
-ipc_test:
+ipc_test: $(BUILD_DIR)/back
 	@python gui/ipc_test.py
 
 #

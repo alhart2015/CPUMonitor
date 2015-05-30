@@ -86,4 +86,5 @@ static TestFunction findTest(const char *name)
 TEST(sanityTest)
 {
   printf("sanityTest: %s\n", socketPath); // yeah
+  exit(0);
 }
