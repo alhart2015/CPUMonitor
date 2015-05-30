@@ -33,7 +33,7 @@
 #define PATH "./.back-test-sock"
 
 #define SMALL_BYTES_COUNT (5)
-static uint8_t smallBytes[SMALL_BYTES_COUNT] = { 1, 2, 3, 4, 5, };
+static uint8_t smallBytes[SMALL_BYTES_COUNT] = { 5, 4, 3, 2, 1, };
 
 #define LARGE_BYTES_COUNT (64)
 static uint8_t largeBytes[LARGE_BYTES_COUNT] = {
