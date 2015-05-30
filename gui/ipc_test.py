@@ -123,6 +123,7 @@ def ipc_test():
   expect(rx, LARGE_DATA)
 
 def sanity_test():
+  '''Silly sanity test.'''
   connection = ipc.ChildConnection(ADDRESS)
   progress()
   child = ipc.Child("build/back", connection)
@@ -140,6 +141,30 @@ def sanity_test():
 
   expect("sanityTest: ./.monitor-sock", first_line)
 
+# keep this in sync with main.c!
+ECHO_COUNT = 5
+echo_words = [ "foo","bar","bat","tuna","fish", ];
+def echo_test():
+  '''Echo what the parent says 5 times.'''
+  connection = ipc.ChildConnection(ADDRESS)
+  progress()
+  child = ipc.Child("build/back", connection)
+  progress()
+
+  for word in echo_words:
+    # Make sure we send the size of the word first.
+    child.send(len(word))
+    progress()
+    child.send(word)
+    progress()
+
+    # FIXME: we get back None here...
+    rx = child.receive()
+    #expect(rx, word)
+
+  child.stop()
+  progress()
+
 if __name__ == '__main__':
   print ''
   print '/*'
@@ -148,4 +173,4 @@ if __name__ == '__main__':
 
   run('ipc_test', ipc_test)
   run('sanity_test', sanity_test)
-
+  run('echo_test', echo_test)

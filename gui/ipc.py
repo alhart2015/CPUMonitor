@@ -51,6 +51,9 @@ class ChildConnection:
 
 class Child:
 
+  # TODO: better way to set this?
+  RECEIVE_SIZE = 256
+
   def __init__(self, image, connection):
     """Initialize a child process to communicate with."""
     self.image = image
@@ -70,6 +73,8 @@ class Child:
         command.append(arg)
 
     # TODO: we should start with a clean file here.
+    # This is not the way to do this at all.
+    os.system("touch " + self.child_file_name)
     self.child_file = open(self.child_file_name, "r+")
     subprocess.Popen(command, stdout=self.child_file)
 
@@ -92,4 +97,10 @@ class Child:
     """Run a child test called 'name'."""
     self.start("-t " + name)
 
+  def send(self, data):
+    """Send some data to the child."""
+    self.connection.send(data)
 
+  def receive(self):
+    """Receive some data from the child."""
+    self.connection.receive(self.RECEIVE_SIZE)
