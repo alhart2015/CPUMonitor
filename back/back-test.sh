@@ -67,5 +67,23 @@ else
   echo "...unrecognized options not accepted..."
 fi
 
+# Try to run the sanity test.
+$EXEC -p $SOCKET_PATH -t sanityTest | grep -q "sanityTest"
+if [ $? != "0" ]; then
+  echo "FAIL: unable to run the sanityTest."
+  exit 1
+else
+  echo "...sanityTest runs..."
+fi
+
+# Make sure an unknown test throws an error.
+$EXEC -p $SOCKET_PATH -t tuna | grep -q "error: unknown test tuna"
+if [ $? != "0" ]; then
+  echo "FAIL: no error thrown for unknown test."
+  exit 1
+else
+  echo "...unknown test throws error..."
+fi
+
 echo "...PASS."
 exit 0
