@@ -82,6 +82,7 @@ static TestFunction findTest(const char *name)
   TestFunction test = NULL;
 
   TRY_TEST(sanityTest, name, test);
+  TRY_TEST(echoTest, name, test);
 
   return test;
 }
@@ -99,28 +100,31 @@ TEST(sanityTest)
 static const char *echoWords[ECHO_COUNT] = { "foo","bar","bat","tuna","fish", };
 TEST(echoTest)
 {
-  uint8_t i, buffer[32];
+  uint8_t i, buffer[32], wordLength;
   bool fail = false;
 
   assert(ipcInit(socketPath) == 0);
 
   for (i = 0; i < ECHO_COUNT && !fail; i ++) {
+    memset(buffer, 0, sizeof(buffer) / sizeof(buffer[0]));
+
     // Get the length of the data.
-    ipcReceive(&(buffer[0]), 1);
-    printf("got the length of the data: %d\n", buffer[0]);
+    ipcReceive(buffer, 1);
+    wordLength = atoi((const char *)&(buffer[0]));
+    printf("got the length of the data: %d\n", wordLength);
 
     // Get the rest of the data.
-    ipcReceive(&(buffer[1]), buffer[0]);
-    printf("got the rest of the data: %s\n", &(buffer[1]));
+    ipcReceive(buffer, wordLength);
+    printf("got the rest of the data: %s\n", buffer);
 
     // Make sure the data is correct.
-    fail = (strcmp((const char *)&(buffer[1]), echoWords[i]) != 0);
-    printf("the data is correct\n");
+    fail = (strcmp((const char *)&(buffer[0]), echoWords[i]) != 0);
+    if (!fail) printf("the data is correct\n");
 
     // Ship it back.
     if (!fail) {
-      ipcTransmit(&(buffer[1]), buffer[0]);
-      printf("sending the data back\n");
+      printf("sending the data back (err = %d)\n",
+             ipcTransmit(buffer, wordLength));
     }
   }
 

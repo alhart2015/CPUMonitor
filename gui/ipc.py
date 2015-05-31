@@ -53,6 +53,7 @@ class Child:
 
   # TODO: better way to set this?
   RECEIVE_SIZE = 256
+  CHILD_FILE_NAME = "./.child-file"
 
   def __init__(self, image, connection):
     """Initialize a child process to communicate with."""
@@ -60,7 +61,6 @@ class Child:
     self.connection = connection
 
     self.child_file = None
-    self.child_file_name = "./.child-file"
 
   def start(self, args):
     """Start the child process, passing the args. If args is None,
@@ -72,11 +72,17 @@ class Child:
       for arg in args.split(" "):
         command.append(arg)
 
-    # TODO: we should start with a clean file here.
-    # This is not the way to do this at all.
-    os.system("touch " + self.child_file_name)
-    self.child_file = open(self.child_file_name, "r+")
+    # We should start with a clean file here.
+    if os.path.exists(self.CHILD_FILE_NAME):
+      os.unlink(self.CHILD_FILE_NAME)
+    os.system("touch " + self.CHILD_FILE_NAME)
+    self.child_file = open(self.CHILD_FILE_NAME, "r+")
     subprocess.Popen(command, stdout=self.child_file)
+
+    # Accept the child process connection when it comes a callin.
+    # We don't do this for the sanity test.
+    if args != "-t sanityTest":
+      self.connection.accept()
 
   def stop(self):
     """Stop the child process, and close the child file."""
@@ -87,6 +93,8 @@ class Child:
     """Dump the contents of the child file. If the
        child file has not been created, this will return None. To
        create the child file, call start()."""
+    # FIXME: we can't read the file? It has something to do with the creation
+    # of the file?
     data = None
     if self.child_file is not None:
       self.child_file.flush()
